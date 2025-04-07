@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Gate Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                        dark: '#1e293b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        .gate-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin: 0 auto;
+        }
+        .truth-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .truth-table th, .truth-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .truth-table th {
+            background-color: #f1f5f9;
+        }
+        .gate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-dark">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-primary">Logic Gate Simulator</h1>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#gates" class="text-gray-600 hover:text-primary transition">Gates</a></li>
+                        <li><a href="#calculator" class="text-gray-600 hover:text-primary transition">Calculator</a></li>
+                        <li><a href="#about" class="text-gray-600 hover:text-primary transition">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary to-secondary text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-4">Interactive Logic Gate Simulator</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-8">Explore, learn and calculate with basic logic gates. Understand how they work through interactive truth tables and simulations.</p>
+            <a href="#calculator" class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Try Calculator</a>
+        </div>
+    </section>
+
+    <!-- Logic Gates Section -->
+    <section id="gates" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Basic Logic Gates</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AND Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-blue-100 text-blue-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">AND Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs true only when all inputs are true.</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                                    <tr><td>0</td><td>1</td><td>0</td></tr>
+                                    <tr><td>1</td><td>0</td><td>0</td></tr>
+                                    <tr><td>1</td><td>1</td><td>1</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OR Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-purple-100 text-purple-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-6"/>
+                                <path d="M2 12h6"/>
+                                <path d="M12 2v20"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">OR Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs true when at least one input is true.</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                                    <tr><td>0</td><td>1</td><td>1</td></tr>
+                                    <tr><td>1</td><td>0</td><td>1</td></tr>
+                                    <tr><td>1</td><td>1</td><td>1</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOT Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-red-100 text-red-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">NOT Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs the inverse of the input (only one input).</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>Input</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>1</td></tr>
+                                    <tr><td>1</td><td>0</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NAND Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-yellow-100 text-yellow-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">NAND Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs false only when all inputs are true (AND + NOT).</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>0</td><td>1</td></tr>
+                                    <tr><td>0</td><td>1</td><td>1</td></tr>
+                                    <tr><td>1</td><td>0</td><td>1</td></tr>
+                                    <tr><td>1</td><td>1</td><td>0</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOR Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-green-100 text-green-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-6"/>
+                                <path d="M2 12h6"/>
+                                <path d="M12 2v20"/>
+                                <circle cx="12" cy="12" r="10"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">NOR Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs true only when all inputs are false (OR + NOT).</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>0</td><td>1</td></tr>
+                                    <tr><td>0</td><td>1</td><td>0</td></tr>
+                                    <tr><td>1</td><td>0</td><td>0</td></tr>
+                                    <tr><td>1</td><td>1</td><td>0</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- XOR Gate -->
+                <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
+                    <div class="p-6">
+                        <div class="gate-icon bg-pink-100 text-pink-600 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2v20M2 12h20M2 6h4M2 18h4M18 6h4M18 18h4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">XOR Gate</h3>
+                        <p class="text-gray-600 mb-4">Outputs true when inputs are different (exclusive OR).</p>
+                        <div class="overflow-x-auto">
+                            <table class="truth-table">
+                                <thead>
+                                    <tr>
+                                        <th>A</th>
+                                        <th>B</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>0</td><td>0</td><td>0</td></tr>
+                                    <tr><td>0</td><td>1</td><td>1</td></tr>
+                                    <tr><td>1</td><td>0</td><td>1</td></tr>
+                                    <tr><td>1</td><td>1</td><td>0</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section id="calculator" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Logic Gate Calculator</h2>
+            
+            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Input Values</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Input A</label>
+                                <select id="inputA" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <option value="0">0 (False)</option>
+                                    <option value="1">1 (True)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Input B</label>
+                                <select id="inputB" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <option value="0">0 (False)</option>
+                                    <option value="1">1 (True)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Select Gate</label>
+                                <select id="gateSelect" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                    <option value="AND">AND Gate</option>
+                                    <option value="OR">OR Gate</option>
+                                    <option value="NOT">NOT Gate</option>
+                                    <option value="NAND">NAND Gate</option>
+                                    <option value="NOR">NOR Gate</option>
+                                    <option value="XOR">XOR Gate</option>
+                                </select>
+                            </div>
+                            <button onclick="calculate()" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition">Calculate</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4">Result</h3>
+                        <div class="bg-gray-50 p-6 rounded-lg h-full flex flex-col justify-center items-center">
+                            <div id="resultIcon" class="gate-icon bg-blue-100 text-blue-600 mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-gray-600 mb-2">Selected Gate: <span id="selectedGate" class="font-medium">AND</span></p>
+                                <p class="text-gray-600 mb-2">Input A: <span id="displayA" class="font-medium">0</span></p>
+                                <p class="text-gray-600 mb-2">Input B: <span id="displayB" class="font-medium">0</span></p>
+                                <div class="mt-4">
+                                    <p class="text-gray-600">Output:</p>
+                                    <p id="outputResult" class="text-3xl font-bold text-primary">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-8">About Logic Gates</h2>
+                <div class="prose prose-lg text-gray-600">
+                    <p>Logic gates are the fundamental building blocks of digital circuits. They perform basic logical functions that are essential to digital circuits. Most electronic devices we use today contain logic gates.</p>
+                    
+                    <h3 class="text-xl font-semibold mt-6">How Logic Gates Work</h3>
+                    <p>Logic gates take binary inputs (0s and 1s) and produce a single binary output based on their operation. The seven basic logic gates are:</p>
+                    <ul class="list-disc pl-5">
+                        <li><strong>AND:</strong> Output is 1 only if all inputs are 1</li>
+                        <li><strong>OR:</strong> Output is 1 if at least one input is 1</li>
+                        <li><strong>NOT:</strong> Output is the inverse of the input</li>
+                        <li><strong>NAND:</strong> Output is 0 only if all inputs are 1 (AND + NOT)</li>
+                        <li><strong>NOR:</strong> Output is 1 only if all inputs are 0 (OR + NOT)</li>
+                        <li><strong>XOR:</strong> Output is 1 if inputs are different</li>
+                        <li><strong>XNOR:</strong> Output is 1 if inputs are same (XOR + NOT)</li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold mt-6">Applications</h3>
+                    <p>Logic gates are used in:</p>
+                    <ul class="list-disc pl-5">
+                        <li>Computer processors</li>
+                        <li>Memory chips</li>
+                        <li>Digital clocks</li>
+                        <li>Calculators</li>
+                        <li>Traffic light controllers</li>
+                        <li>And many other digital devices</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-2xl font-bold text-white">Logic Gate Simulator</h2>
+                    <p class="text-gray-400">Interactive tool for learning digital logic</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Contact</a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 Logic Gate Simulator. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Gate icons mapping
+        const gateIcons = {
+            'AND': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+            'OR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6"/><path d="M2 12h6"/><path d="M12 2v20"/></svg>`,
+            'NOT': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/></svg>`,
+            'NAND': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/><circle cx="12" cy="12" r="10"/></svg>`,
+            'NOR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6"/><path d="M2 12h6"/><path d="M12 2v20"/><circle cx="12" cy="12" r="10"/></svg>`,
+            'XOR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M2 6h4M2 18h4M18 6h4M18 18h4"/></svg>`
+        };
+
+        // Gate colors mapping
+        const gateColors = {
+            'AND': 'blue',
+            'OR': 'purple',
+            'NOT': 'red',
+            'NAND': 'yellow',
+            'NOR': 'green',
+            'XOR': 'pink'
+        };
+
+        // Update display when gate selection changes
+        document.getElementById('gateSelect').addEventListener('change', function() {
+            const selectedGate = this.value;
+            document.getElementById('selectedGate').textContent = selectedGate;
+            
+            // Update icon
+            const resultIcon = document.getElementById('resultIcon');
+            resultIcon.innerHTML = gateIcons[selectedGate];
+            
+            // Update color
+            resultIcon.className = `gate-icon bg-${gateColors[selectedGate]}-100 text-${gateColors[selectedGate]}-600 mb-6`;
+        });
+
+        // Calculation function
+        function calculate() {
+            const inputA = parseInt(document.getElementById('inputA').value);
+            const inputB = parseInt(document.getElementById('inputB').value);
+            const gateType = document.getElementById('gateSelect').value;
+            
+            // Display inputs
+            document.getElementById('displayA').textContent = inputA;
+            document.getElementById('displayB').textContent = inputB;
+            
+            let result;
+            
+            switch(gateType) {
+                case 'AND':
+                    result = inputA && inputB;
+                    break;
+                case 'OR':
+                    result = inputA || inputB;
+                    break;
+                case 'NOT':
+                    result = inputA ? 0 : 1;
+                    break;
+                case 'NAND':
+                    result = (inputA && inputB) ? 0 : 1;
+                    break;
+                case 'NOR':
+                    result = (inputA || inputB) ? 0 : 1;
+                    break;
+                case 'XOR':
+                    result = (inputA !== inputB) ? 1 : 0;
+                    break;
+                default:
+                    result = 0;
+            }
+            
+            document.getElementById('outputResult').textContent = result;
+        }
+
+        // Initialize calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            calculate();
+        });
+    </script>
+</body>
+</html>
