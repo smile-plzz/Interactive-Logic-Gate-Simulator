@@ -3,24 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logic Gate Simulator</title>
+    <title>Advanced Logic Gate Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#6366f1',
-                        secondary: '#8b5cf6',
-                        dark: '#1e293b',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <style>
         .gate-icon {
             width: 60px;
@@ -47,18 +34,83 @@
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        #workspace {
+            min-height: 400px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 0.5rem;
+            background-color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+        .draggable-gate {
+            position: absolute;
+            cursor: move;
+            z-index: 10;
+        }
+        .gate-node {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        .connection-point {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            position: absolute;
+            cursor: pointer;
+        }
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background-color: #6366f1;
+            transform-origin: left center;
+            z-index: 5;
+        }
+        .simulation-area {
+            transition: all 0.3s ease;
+        }
+        .simulation-area.active {
+            box-shadow: 0 0 0 2px #10b981;
+        }
+        .input-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .input-toggle.true {
+            background-color: #10b981;
+            color: white;
+        }
+        .input-toggle.false {
+            background-color: #ef4444;
+            color: white;
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-dark">
+<body class="bg-gray-50 font-sans text-gray-800">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
-        <div class="container mx-auto px-4 py-6">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-primary">Logic Gate Simulator</h1>
+                <h1 class="text-2xl font-bold text-primary">Advanced Logic Gate Simulator</h1>
                 <nav>
-                    <ul class="flex space-x-6">
+                    <ul class="flex space-x-4">
                         <li><a href="#gates" class="text-gray-600 hover:text-primary transition">Gates</a></li>
-                        <li><a href="#calculator" class="text-gray-600 hover:text-primary transition">Calculator</a></li>
+                        <li><a href="#simulator" class="text-gray-600 hover:text-primary transition">Simulator</a></li>
+                        <li><a href="#circuit-builder" class="text-gray-600 hover:text-primary transition">Circuit Builder</a></li>
                         <li><a href="#about" class="text-gray-600 hover:text-primary transition">About</a></li>
                     </ul>
                 </nav>
@@ -67,37 +119,47 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-primary to-secondary text-white py-20">
+    <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
         <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl font-bold mb-4">Interactive Logic Gate Simulator</h2>
-            <p class="text-xl max-w-2xl mx-auto mb-8">Explore, learn and calculate with basic logic gates. Understand how they work through interactive truth tables and simulations.</p>
-            <a href="#calculator" class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Try Calculator</a>
+            <h2 class="text-4xl font-bold mb-4">Interactive Logic Gate Learning Tool</h2>
+            <p class="text-xl max-w-3xl mx-auto mb-8">Explore, simulate, and build digital logic circuits with this comprehensive educational tool.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#simulator" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition">Start Simulating</a>
+                <a href="#circuit-builder" class="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-indigo-600 transition">Build Circuits</a>
+            </div>
         </div>
     </section>
 
-    <!-- Logic Gates Section -->
+    <!-- Logic Gates Section with Mathematical Equations -->
     <section id="gates" class="py-16 bg-white">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Basic Logic Gates</h2>
+            <h2 class="text-3xl font-bold text-center mb-12">Logic Gates with Mathematical Representation</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- AND Gate -->
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-blue-100 text-blue-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="70" x2="20" y2="70" stroke="currentColor" stroke-width="4"/>
+                                <line x1="60" y1="50" x2="80" y2="50" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">AND Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs true only when all inputs are true.</p>
+                        <p class="text-gray-600 mb-2">Outputs true only when all inputs are true.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = A \cdot B \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
                                         <th>A</th>
                                         <th>B</th>
-                                        <th>Output</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -115,21 +177,26 @@
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-purple-100 text-purple-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-6"/>
-                                <path d="M2 12h6"/>
-                                <path d="M12 2v20"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="70" x2="20" y2="70" stroke="currentColor" stroke-width="4"/>
+                                <line x1="70" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">OR Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs true when at least one input is true.</p>
+                        <p class="text-gray-600 mb-2">Outputs true when at least one input is true.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = A + B \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
                                         <th>A</th>
                                         <th>B</th>
-                                        <th>Output</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,19 +214,25 @@
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-red-100 text-red-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <polygon points="20,30 60,50 20,70" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <circle cx="70" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="4"/>
+                                <line x1="80" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">NOT Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs the inverse of the input (only one input).</p>
+                        <p class="text-gray-600 mb-2">Outputs the inverse of the input.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = \overline{A} \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
-                                        <th>Input</th>
-                                        <th>Output</th>
+                                        <th>A</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -175,20 +248,27 @@
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-yellow-100 text-yellow-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                                <circle cx="12" cy="12" r="10"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="70" x2="20" y2="70" stroke="currentColor" stroke-width="4"/>
+                                <circle cx="75" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">NAND Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs false only when all inputs are true (AND + NOT).</p>
+                        <p class="text-gray-600 mb-2">Outputs false only when all inputs are true.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = \overline{A \cdot B} \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
                                         <th>A</th>
                                         <th>B</th>
-                                        <th>Output</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -206,22 +286,27 @@
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-green-100 text-green-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-6"/>
-                                <path d="M2 12h6"/>
-                                <path d="M12 2v20"/>
-                                <circle cx="12" cy="12" r="10"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="4"/>
+                                <line x1="10" y1="70" x2="20" y2="70" stroke="currentColor" stroke-width="4"/>
+                                <circle cx="80" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <line x1="90" y1="50" x2="100" y2="50" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">NOR Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs true only when all inputs are false (OR + NOT).</p>
+                        <p class="text-gray-600 mb-2">Outputs true only when all inputs are false.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = \overline{A + B} \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
                                         <th>A</th>
                                         <th>B</th>
-                                        <th>Output</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -239,19 +324,26 @@
                 <div class="gate-card bg-white rounded-xl shadow-md overflow-hidden transition duration-300">
                     <div class="p-6">
                         <div class="gate-icon bg-pink-100 text-pink-600 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 2v20M2 12h20M2 6h4M2 18h4M18 6h4M18 18h4"/>
+                            <svg width="60" height="60" viewBox="0 0 200 100">
+                                <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/>
+                                <path d="M10,30 L25,30 M10,70 L25,70" stroke="currentColor" stroke-width="4"/>
+                                <path d="M70,50 L90,50" stroke="currentColor" stroke-width="4"/>
+                                <path d="M30,30 L40,30 M30,70 L40,70" stroke="currentColor" stroke-width="4"/>
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold mb-2">XOR Gate</h3>
-                        <p class="text-gray-600 mb-4">Outputs true when inputs are different (exclusive OR).</p>
+                        <p class="text-gray-600 mb-2">Outputs true when inputs are different.</p>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-500">Mathematical Expression:</p>
+                            <p class="text-lg">\( Q = A \oplus B = A\overline{B} + \overline{A}B \)</p>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="truth-table">
                                 <thead>
                                     <tr>
                                         <th>A</th>
                                         <th>B</th>
-                                        <th>Output</th>
+                                        <th>Q</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -268,61 +360,225 @@
         </div>
     </section>
 
-    <!-- Calculator Section -->
-    <section id="calculator" class="py-16 bg-gray-50">
+    <!-- Interactive Simulator Section -->
+    <section id="simulator" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Logic Gate Calculator</h2>
+            <h2 class="text-3xl font-bold text-center mb-12">Interactive Gate Simulator</h2>
             
-            <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Input Values</h3>
-                        <div class="space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">Live Gate Simulation</h3>
+                    <div class="flex justify-center mb-6">
+                        <div id="simulationArea" class="simulation-area bg-gray-100 p-8 rounded-lg">
+                            <div class="flex items-center justify-center space-x-8 mb-8">
+                                <div class="input-toggle false" data-input="A" onclick="toggleInput('A')">0</div>
+                                <div class="input-toggle false" data-input="B" onclick="toggleInput('B')">0</div>
+                            </div>
+                            <div id="simulationGate" class="mx-auto">
+                                <svg width="200" height="150" viewBox="0 0 200 150" id="gateSvg">
+                                    <!-- Gate will be rendered here -->
+                                </svg>
+                            </div>
+                            <div class="mt-8 text-center">
+                                <p class="text-gray-600 mb-2">Output:</p>
+                                <div id="simulationOutput" class="text-4xl font-bold text-indigo-600">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2">Select Gate Type</label>
+                            <select id="simulationGateType" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" onchange="updateSimulationGate()">
+                                <option value="AND">AND Gate</option>
+                                <option value="OR">OR Gate</option>
+                                <option value="NOT">NOT Gate</option>
+                                <option value="NAND">NAND Gate</option>
+                                <option value="NOR">NOR Gate</option>
+                                <option value="XOR">XOR Gate</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-gray-700 mb-2">Input A</label>
-                                <select id="inputA" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                <select id="simulationInputA" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" onchange="updateSimulation()">
                                     <option value="0">0 (False)</option>
                                     <option value="1">1 (True)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-gray-700 mb-2">Input B</label>
-                                <select id="inputB" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                <select id="simulationInputB" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" onchange="updateSimulation()">
                                     <option value="0">0 (False)</option>
                                     <option value="1">1 (True)</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Select Gate</label>
-                                <select id="gateSelect" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <option value="AND">AND Gate</option>
-                                    <option value="OR">OR Gate</option>
-                                    <option value="NOT">NOT Gate</option>
-                                    <option value="NAND">NAND Gate</option>
-                                    <option value="NOR">NOR Gate</option>
-                                    <option value="XOR">XOR Gate</option>
-                                </select>
-                            </div>
-                            <button onclick="calculate()" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition">Calculate</button>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Result</h3>
-                        <div class="bg-gray-50 p-6 rounded-lg h-full flex flex-col justify-center items-center">
-                            <div id="resultIcon" class="gate-icon bg-blue-100 text-blue-600 mb-6">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                                </svg>
-                            </div>
-                            <div class="text-center">
-                                <p class="text-gray-600 mb-2">Selected Gate: <span id="selectedGate" class="font-medium">AND</span></p>
-                                <p class="text-gray-600 mb-2">Input A: <span id="displayA" class="font-medium">0</span></p>
-                                <p class="text-gray-600 mb-2">Input B: <span id="displayB" class="font-medium">0</span></p>
-                                <div class="mt-4">
-                                    <p class="text-gray-600">Output:</p>
-                                    <p id="outputResult" class="text-3xl font-bold text-primary">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">Truth Table Generator</h3>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Select Gate</label>
+                        <select id="truthTableGate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" onchange="generateTruthTable()">
+                            <option value="AND">AND Gate</option>
+                            <option value="OR">OR Gate</option>
+                            <option value="NOT">NOT Gate</option>
+                            <option value="NAND">NAND Gate</option>
+                            <option value="NOR">NOR Gate</option>
+                            <option value="XOR">XOR Gate</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="truth-table w-full" id="generatedTruthTable">
+                            <!-- Truth table will be generated here -->
+                        </table>
+                    </div>
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="font-medium mb-2">Boolean Expression:</h4>
+                        <p id="booleanExpression" class="text-lg">\( Q = A \cdot B \)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Circuit Builder Section -->
+    <section id="circuit-builder" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Circuit Builder</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Drag and drop gates to create custom logic circuits. Connect them to see how the output changes.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Workspace</h3>
+                        </div>
+                        <div id="workspace" class="p-4">
+                            <!-- Circuit will be built here -->
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Gate Library</h3>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 gap-4">
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="AND" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="#6366f1" stroke-width="4"/>
+                                            <line x1="10" y1="30" x2="20" y2="30" stroke="#6366f1" stroke-width="4"/>
+                                            <line x1="10" y1="70" x2="20" y2="70" stroke="#6366f1" stroke-width="4"/>
+                                            <line x1="60" y1="50" x2="80" y2="50" stroke="#6366f1" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>AND Gate</span>
                                 </div>
                             </div>
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="OR" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#8b5cf6" stroke-width="4"/>
+                                            <line x1="10" y1="30" x2="20" y2="30" stroke="#8b5cf6" stroke-width="4"/>
+                                            <line x1="10" y1="70" x2="20" y2="70" stroke="#8b5cf6" stroke-width="4"/>
+                                            <line x1="70" y1="50" x2="90" y2="50" stroke="#8b5cf6" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>OR Gate</span>
+                                </div>
+                            </div>
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="NOT" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <polygon points="20,30 60,50 20,70" fill="none" stroke="#ef4444" stroke-width="4"/>
+                                            <circle cx="70" cy="50" r="10" fill="none" stroke="#ef4444" stroke-width="4"/>
+                                            <line x1="10" y1="50" x2="20" y2="50" stroke="#ef4444" stroke-width="4"/>
+                                            <line x1="80" y1="50" x2="90" y2="50" stroke="#ef4444" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>NOT Gate</span>
+                                </div>
+                            </div>
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="NAND" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="#f59e0b" stroke-width="4"/>
+                                            <line x1="10" y1="30" x2="20" y2="30" stroke="#f59e0b" stroke-width="4"/>
+                                            <line x1="10" y1="70" x2="20" y2="70" stroke="#f59e0b" stroke-width="4"/>
+                                            <circle cx="75" cy="50" r="10" fill="none" stroke="#f59e0b" stroke-width="4"/>
+                                            <line x1="85" y1="50" x2="95" y2="50" stroke="#f59e0b" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>NAND Gate</span>
+                                </div>
+                            </div>
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="NOR" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#10b981" stroke-width="4"/>
+                                            <line x1="10" y1="30" x2="20" y2="30" stroke="#10b981" stroke-width="4"/>
+                                            <line x1="10" y1="70" x2="20" y2="70" stroke="#10b981" stroke-width="4"/>
+                                            <circle cx="80" cy="50" r="10" fill="none" stroke="#10b981" stroke-width="4"/>
+                                            <line x1="90" y1="50" x2="100" y2="50" stroke="#10b981" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>NOR Gate</span>
+                                </div>
+                            </div>
+                            <div class="gate-item bg-gray-50 p-3 rounded-lg cursor-move" data-gate="XOR" draggable="true">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 mr-2">
+                                        <svg viewBox="0 0 200 100">
+                                            <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#ec4899" stroke-width="4"/>
+                                            <path d="M10,30 L25,30 M10,70 L25,70" stroke="#ec4899" stroke-width="4"/>
+                                            <path d="M70,50 L90,50" stroke="#ec4899" stroke-width="4"/>
+                                            <path d="M30,30 L40,30 M30,70 L40,70" stroke="#ec4899" stroke-width="4"/>
+                                        </svg>
+                                    </div>
+                                    <span>XOR Gate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Input Controls</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="input-control">
+                                    <label class="block text-gray-700 mb-2">Input A</label>
+                                    <select class="w-full px-3 py-2 border rounded-lg" id="circuitInputA">
+                                        <option value="0">0 (False)</option>
+                                        <option value="1">1 (True)</option>
+                                    </select>
+                                </div>
+                                <div class="input-control">
+                                    <label class="block text-gray-700 mb-2">Input B</label>
+                                    <select class="w-full px-3 py-2 border rounded-lg" id="circuitInputB">
+                                        <option value="0">0 (False)</option>
+                                        <option value="1">1 (True)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="updateCircuitInputs()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">Update Inputs</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="p-4 border-b bg-gray-50">
+                            <h3 class="font-semibold">Circuit Output</h3>
+                        </div>
+                        <div class="p-4 text-center">
+                            <div id="circuitOutput" class="text-4xl font-bold text-indigo-600">-</div>
                         </div>
                     </div>
                 </div>
@@ -331,135 +587,626 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-16 bg-white">
+    <section id="about" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-3xl font-bold text-center mb-8">About Logic Gates</h2>
-                <div class="prose prose-lg text-gray-600">
-                    <p>Logic gates are the fundamental building blocks of digital circuits. They perform basic logical functions that are essential to digital circuits. Most electronic devices we use today contain logic gates.</p>
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-8">
+                    <h2 class="text-3xl font-bold mb-6">About Logic Gates</h2>
                     
-                    <h3 class="text-xl font-semibold mt-6">How Logic Gates Work</h3>
-                    <p>Logic gates take binary inputs (0s and 1s) and produce a single binary output based on their operation. The seven basic logic gates are:</p>
-                    <ul class="list-disc pl-5">
-                        <li><strong>AND:</strong> Output is 1 only if all inputs are 1</li>
-                        <li><strong>OR:</strong> Output is 1 if at least one input is 1</li>
-                        <li><strong>NOT:</strong> Output is the inverse of the input</li>
-                        <li><strong>NAND:</strong> Output is 0 only if all inputs are 1 (AND + NOT)</li>
-                        <li><strong>NOR:</strong> Output is 1 only if all inputs are 0 (OR + NOT)</li>
-                        <li><strong>XOR:</strong> Output is 1 if inputs are different</li>
-                        <li><strong>XNOR:</strong> Output is 1 if inputs are same (XOR + NOT)</li>
-                    </ul>
-                    
-                    <h3 class="text-xl font-semibold mt-6">Applications</h3>
-                    <p>Logic gates are used in:</p>
-                    <ul class="list-disc pl-5">
-                        <li>Computer processors</li>
-                        <li>Memory chips</li>
-                        <li>Digital clocks</li>
-                        <li>Calculators</li>
-                        <li>Traffic light controllers</li>
-                        <li>And many other digital devices</li>
-                    </ul>
+                    <div class="prose max-w-none">
+                        <h3 class="text-xl font-semibold mt-6">Mathematical Foundations</h3>
+                        <p>Logic gates are based on Boolean algebra, a mathematical system developed by George Boole in the mid-19th century. The basic operations are:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium">AND Operation</h4>
+                                <p>\( Q = A \cdot B \)</p>
+                                <p>Also known as logical conjunction</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium">OR Operation</h4>
+                                <p>\( Q = A + B \)</p>
+                                <p>Also known as logical disjunction</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium">NOT Operation</h4>
+                                <p>\( Q = \overline{A} \)</p>
+                                <p>Also known as logical negation</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-medium">NAND Operation</h4>
+                                <p>\( Q = \overline{A \cdot B} \)</p>
+                                <p>Universal gate (can create any other gate)</p>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold mt-6">De Morgan's Theorems</h3>
+                        <p>These important laws in Boolean algebra show the relationship between AND and OR gates with NOT gates:</p>
+                        <div class="my-4">
+                            <p>1. \( \overline{A + B} = \overline{A} \cdot \overline{B} \)</p>
+                            <p>2. \( \overline{A \cdot B} = \overline{A} + \overline{B} \)</p>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold mt-6">Universal Gates</h3>
+                        <p>NAND and NOR gates are called "universal gates" because they can be used to implement any other Boolean function:</p>
+                        <ul class="list-disc pl-5 my-4">
+                            <li><strong>NOT from NAND:</strong> \( \overline{A} = A \text{ NAND } A \)</li>
+                            <li><strong>AND from NAND:</strong> \( A \cdot B = \overline{A \text{ NAND } B} \)</li>
+                            <li><strong>OR from NAND:</strong> \( A + B = \overline{\overline{A} \cdot \overline{B}} \)</li>
+                        </ul>
+                        
+                        <h3 class="text-xl font-semibold mt-6">Applications in Digital Circuits</h3>
+                        <p>Logic gates form the foundation of all digital electronics:</p>
+                        <ul class="list-disc pl-5 my-4">
+                            <li><strong>Adders:</strong> Built using combinations of XOR and AND gates</li>
+                            <li><strong>Flip-flops:</strong> Memory elements created with NAND or NOR gates</li>
+                            <li><strong>Multiplexers:</strong> Use AND, OR, and NOT gates to select inputs</li>
+                            <li><strong>Decoders:</strong> Convert binary codes using multiple AND gates</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-8">
+    <footer class="bg-gray-900 text-white py-8">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <h2 class="text-2xl font-bold text-white">Logic Gate Simulator</h2>
-                    <p class="text-gray-400">Interactive tool for learning digital logic</p>
+                    <h2 class="text-2xl font-bold">Advanced Logic Gate Simulator</h2>
+                    <p class="text-gray-400">An educational tool for digital electronics</p>
                 </div>
                 <div class="flex space-x-6">
-                    <a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a>
-                    <a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">GitHub</a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">Documentation</a>
                     <a href="#" class="text-gray-400 hover:text-white transition">Contact</a>
                 </div>
             </div>
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>© 2023 Logic Gate Simulator. All rights reserved.</p>
+                <p>© 2023 Advanced Logic Gate Simulator. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Gate icons mapping
-        const gateIcons = {
-            'AND': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
-            'OR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6"/><path d="M2 12h6"/><path d="M12 2v20"/></svg>`,
-            'NOT': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/></svg>`,
-            'NAND': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/><circle cx="12" cy="12" r="10"/></svg>`,
-            'NOR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6"/><path d="M2 12h6"/><path d="M12 2v20"/><circle cx="12" cy="12" r="10"/></svg>`,
-            'XOR': `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M2 6h4M2 18h4M18 6h4M18 18h4"/></svg>`
-        };
-
-        // Gate colors mapping
-        const gateColors = {
-            'AND': 'blue',
-            'OR': 'purple',
-            'NOT': 'red',
-            'NAND': 'yellow',
-            'NOR': 'green',
-            'XOR': 'pink'
-        };
-
-        // Update display when gate selection changes
-        document.getElementById('gateSelect').addEventListener('change', function() {
-            const selectedGate = this.value;
-            document.getElementById('selectedGate').textContent = selectedGate;
-            
-            // Update icon
-            const resultIcon = document.getElementById('resultIcon');
-            resultIcon.innerHTML = gateIcons[selectedGate];
-            
-            // Update color
-            resultIcon.className = `gate-icon bg-${gateColors[selectedGate]}-100 text-${gateColors[selectedGate]}-600 mb-6`;
-        });
-
-        // Calculation function
-        function calculate() {
-            const inputA = parseInt(document.getElementById('inputA').value);
-            const inputB = parseInt(document.getElementById('inputB').value);
-            const gateType = document.getElementById('gateSelect').value;
-            
-            // Display inputs
-            document.getElementById('displayA').textContent = inputA;
-            document.getElementById('displayB').textContent = inputB;
-            
-            let result;
+        // Gate simulation functions
+        function simulateGate(gateType, inputA, inputB) {
+            inputA = parseInt(inputA);
+            inputB = parseInt(inputB);
             
             switch(gateType) {
-                case 'AND':
-                    result = inputA && inputB;
-                    break;
-                case 'OR':
-                    result = inputA || inputB;
-                    break;
-                case 'NOT':
-                    result = inputA ? 0 : 1;
-                    break;
-                case 'NAND':
-                    result = (inputA && inputB) ? 0 : 1;
-                    break;
-                case 'NOR':
-                    result = (inputA || inputB) ? 0 : 1;
-                    break;
-                case 'XOR':
-                    result = (inputA !== inputB) ? 1 : 0;
-                    break;
-                default:
-                    result = 0;
+                case 'AND': return inputA && inputB;
+                case 'OR': return inputA || inputB;
+                case 'NOT': return inputA ? 0 : 1;
+                case 'NAND': return (inputA && inputB) ? 0 : 1;
+                case 'NOR': return (inputA || inputB) ? 0 : 1;
+                case 'XOR': return (inputA !== inputB) ? 1 : 0;
+                default: return 0;
+            }
+        }
+        
+        // Update simulation display
+        function updateSimulation() {
+            const gateType = document.getElementById('simulationGateType').value;
+            const inputA = document.getElementById('simulationInputA').value;
+            const inputB = document.getElementById('simulationInputB').value;
+            
+            // Update toggle buttons
+            document.querySelector('[data-input="A"]').className = `input-toggle ${inputA === '1' ? 'true' : 'false'}`;
+            document.querySelector('[data-input="A"]').textContent = inputA;
+            document.querySelector('[data-input="B"]').className = `input-toggle ${inputB === '1' ? 'true' : 'false'}`;
+            document.querySelector('[data-input="B"]').textContent = inputB;
+            
+            // Calculate result
+            const result = simulateGate(gateType, inputA, inputB);
+            document.getElementById('simulationOutput').textContent = result;
+            
+            // Highlight simulation area
+            const simulationArea = document.getElementById('simulationArea');
+            simulationArea.classList.add('active');
+            setTimeout(() => simulationArea.classList.remove('active'), 300);
+        }
+        
+        // Toggle input buttons
+        function toggleInput(input) {
+            const toggle = document.querySelector(`[data-input="${input}"]`);
+            const isTrue = toggle.classList.contains('true');
+            const newValue = isTrue ? '0' : '1';
+            
+            if (input === 'A') {
+                document.getElementById('simulationInputA').value = newValue;
+            } else {
+                document.getElementById('simulationInputB').value = newValue;
             }
             
-            document.getElementById('outputResult').textContent = result;
+            updateSimulation();
         }
-
-        // Initialize calculator
+        
+        // Update gate visualization
+        function updateSimulationGate() {
+            const gateType = document.getElementById('simulationGateType').value;
+            const svg = document.getElementById('gateSvg');
+            svg.innerHTML = '';
+            
+            // Draw the selected gate
+            switch(gateType) {
+                case 'AND':
+                    svg.innerHTML = `
+                        <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="#6366f1" stroke-width="4"/>
+                        <line x1="10" y1="30" x2="20" y2="30" stroke="#6366f1" stroke-width="4"/>
+                        <line x1="10" y1="70" x2="20" y2="70" stroke="#6366f1" stroke-width="4"/>
+                        <line x1="60" y1="50" x2="80" y2="50" stroke="#6366f1" stroke-width="4"/>
+                    `;
+                    break;
+                case 'OR':
+                    svg.innerHTML = `
+                        <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#8b5cf6" stroke-width="4"/>
+                        <line x1="10" y1="30" x2="20" y2="30" stroke="#8b5cf6" stroke-width="4"/>
+                        <line x1="10" y1="70" x2="20" y2="70" stroke="#8b5cf6" stroke-width="4"/>
+                        <line x1="70" y1="50" x2="90" y2="50" stroke="#8b5cf6" stroke-width="4"/>
+                    `;
+                    break;
+                case 'NOT':
+                    svg.innerHTML = `
+                        <polygon points="20,30 60,50 20,70" fill="none" stroke="#ef4444" stroke-width="4"/>
+                        <circle cx="70" cy="50" r="10" fill="none" stroke="#ef4444" stroke-width="4"/>
+                        <line x1="10" y1="50" x2="20" y2="50" stroke="#ef4444" stroke-width="4"/>
+                        <line x1="80" y1="50" x2="90" y2="50" stroke="#ef4444" stroke-width="4"/>
+                    `;
+                    break;
+                case 'NAND':
+                    svg.innerHTML = `
+                        <path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="#f59e0b" stroke-width="4"/>
+                        <line x1="10" y1="30" x2="20" y2="30" stroke="#f59e0b" stroke-width="4"/>
+                        <line x1="10" y1="70" x2="20" y2="70" stroke="#f59e0b" stroke-width="4"/>
+                        <circle cx="75" cy="50" r="10" fill="none" stroke="#f59e0b" stroke-width="4"/>
+                        <line x1="85" y1="50" x2="95" y2="50" stroke="#f59e0b" stroke-width="4"/>
+                    `;
+                    break;
+                case 'NOR':
+                    svg.innerHTML = `
+                        <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#10b981" stroke-width="4"/>
+                        <line x1="10" y1="30" x2="20" y2="30" stroke="#10b981" stroke-width="4"/>
+                        <line x1="10" y1="70" x2="20" y2="70" stroke="#10b981" stroke-width="4"/>
+                        <circle cx="80" cy="50" r="10" fill="none" stroke="#10b981" stroke-width="4"/>
+                        <line x1="90" y1="50" x2="100" y2="50" stroke="#10b981" stroke-width="4"/>
+                    `;
+                    break;
+                case 'XOR':
+                    svg.innerHTML = `
+                        <path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="#ec4899" stroke-width="4"/>
+                        <path d="M10,30 L25,30 M10,70 L25,70" stroke="#ec4899" stroke-width="4"/>
+                        <path d="M70,50 L90,50" stroke="#ec4899" stroke-width="4"/>
+                        <path d="M30,30 L40,30 M30,70 L40,70" stroke="#ec4899" stroke-width="4"/>
+                    `;
+                    break;
+            }
+            
+            updateSimulation();
+        }
+        
+        // Generate truth table
+        function generateTruthTable() {
+            const gateType = document.getElementById('truthTableGate').value;
+            const table = document.getElementById('generatedTruthTable');
+            table.innerHTML = '';
+            
+            // Set boolean expression
+            let expression = '';
+            switch(gateType) {
+                case 'AND': expression = 'Q = A \\cdot B'; break;
+                case 'OR': expression = 'Q = A + B'; break;
+                case 'NOT': expression = 'Q = \\overline{A}'; break;
+                case 'NAND': expression = 'Q = \\overline{A \\cdot B}'; break;
+                case 'NOR': expression = 'Q = \\overline{A + B}'; break;
+                case 'XOR': expression = 'Q = A \\oplus B'; break;
+            }
+            document.getElementById('booleanExpression').innerHTML = `\\( ${expression} \\)`;
+            
+            // Render MathJax after updating the expression
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typeset();
+            }
+            
+            // Create table header
+            let thead = table.createTHead();
+            let row = thead.insertRow();
+            
+            if (gateType === 'NOT') {
+                row.insertCell().textContent = 'A';
+                row.insertCell().textContent = 'Q';
+                
+                // Create table body
+                let tbody = table.createTBody();
+                for (let a = 0; a <= 1; a++) {
+                    let row = tbody.insertRow();
+                    row.insertCell().textContent = a;
+                    row.insertCell().textContent = simulateGate(gateType, a, 0);
+                }
+            } else {
+                row.insertCell().textContent = 'A';
+                row.insertCell().textContent = 'B';
+                row.insertCell().textContent = 'Q';
+                
+                // Create table body
+                let tbody = table.createTBody();
+                for (let a = 0; a <= 1; a++) {
+                    for (let b = 0; b <= 1; b++) {
+                        let row = tbody.insertRow();
+                        row.insertCell().textContent = a;
+                        row.insertCell().textContent = b;
+                        row.insertCell().textContent = simulateGate(gateType, a, b);
+                    }
+                }
+            }
+        }
+        
+        // Circuit builder variables
+        let circuitGates = [];
+        let connections = [];
+        let draggingGate = null;
+        let connectingFrom = null;
+        
+        // Initialize circuit builder
+        function initCircuitBuilder() {
+            // Make gate items draggable
+            interact('.gate-item').draggable({
+                inertia: false,
+                autoScroll: true,
+                listeners: {
+                    start(event) {
+                        draggingGate = event.target.getAttribute('data-gate');
+                        event.target.classList.add('opacity-50');
+                    },
+                    move(event) {
+                        // Show preview while dragging
+                    },
+                    end(event) {
+                        event.target.classList.remove('opacity-50');
+                        
+                        // Check if dropped on workspace
+                        const workspace = document.getElementById('workspace');
+                        const dropX = event.clientX - workspace.getBoundingClientRect().left;
+                        const dropY = event.clientY - workspace.getBoundingClientRect().top;
+                        
+                        if (dropX >= 0 && dropY >= 0 && 
+                            dropX <= workspace.offsetWidth && 
+                            dropY <= workspace.offsetHeight) {
+                            addGateToWorkspace(draggingGate, dropX, dropY);
+                        }
+                        
+                        draggingGate = null;
+                    }
+                }
+            });
+            
+            // Make workspace a drop zone
+            interact('#workspace').dropzone({
+                accept: '.gate-item',
+                ondrop: function(event) {
+                    // Handled by draggable end event
+                }
+            });
+        }
+        
+        // Add a gate to the workspace
+        function addGateToWorkspace(gateType, x, y) {
+            const gateId = 'gate-' + Date.now();
+            const workspace = document.getElementById('workspace');
+            
+            // Create gate element
+            const gateElement = document.createElement('div');
+            gateElement.className = 'draggable-gate';
+            gateElement.id = gateId;
+            gateElement.style.left = `${x - 40}px`;
+            gateElement.style.top = `${y - 40}px`;
+            
+            // Set gate color based on type
+            let gateColor, gateIcon;
+            switch(gateType) {
+                case 'AND':
+                    gateColor = 'blue';
+                    gateIcon = `<path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+                case 'OR':
+                    gateColor = 'purple';
+                    gateIcon = `<path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+                case 'NOT':
+                    gateColor = 'red';
+                    gateIcon = `<polygon points="20,30 60,50 20,70" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="70" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+                case 'NAND':
+                    gateColor = 'yellow';
+                    gateIcon = `<path d="M20,50 Q50,50 60,20 L60,80 Q50,50 20,50 Z" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="75" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+                case 'NOR':
+                    gateColor = 'green';
+                    gateIcon = `<path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="80" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+                case 'XOR':
+                    gateColor = 'pink';
+                    gateIcon = `<path d="M20,30 Q40,30 50,50 Q40,70 20,70 L50,70 Q65,70 70,50 Q65,30 50,30 L20,30" fill="none" stroke="currentColor" stroke-width="4"/><path d="M10,30 L25,30 M10,70 L25,70" stroke="currentColor" stroke-width="4"/><path d="M30,30 L40,30 M30,70 L40,70" stroke="currentColor" stroke-width="4"/>`;
+                    break;
+            }
+            
+            gateElement.innerHTML = `
+                <div class="gate-node bg-${gateColor}-100 text-${gateColor}-600 shadow-md">
+                    <svg width="60" height="60" viewBox="0 0 200 100">
+                        ${gateIcon}
+                        ${gateType === 'NOT' ? 
+                            `<line x1="10" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="4"/>
+                             <line x1="80" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="4"/>` : 
+                            `<line x1="10" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="4"/>
+                             <line x1="10" y1="70" x2="20" y2="70" stroke="currentColor" stroke-width="4"/>
+                             <line x1="${gateType === 'NAND' ? 85 : gateType === 'NOR' ? 90 : 70}" y1="50" x2="${gateType === 'NAND' ? 95 : gateType === 'NOR' ? 100 : 90}" y2="50" stroke="currentColor" stroke-width="4"/>`}
+                    </svg>
+                    <div class="text-xs mt-1 text-center">${gateType}</div>
+                </div>
+                ${gateType === 'NOT' ? 
+                    `<div class="connection-point input" style="left: -6px; top: 40px;"></div>
+                     <div class="connection-point output" style="right: -6px; top: 40px;"></div>` :
+                    `<div class="connection-point input" style="left: -6px; top: 20px;"></div>
+                     <div class="connection-point input" style="left: -6px; top: 60px;"></div>
+                     <div class="connection-point output" style="right: -6px; top: 40px;"></div>`}
+            `;
+            
+            workspace.appendChild(gateElement);
+            
+            // Add to gates array
+            circuitGates.push({
+                id: gateId,
+                type: gateType,
+                element: gateElement,
+                inputs: gateType === 'NOT' ? [null] : [null, null],
+                output: null
+            });
+            
+            // Make gate draggable
+            interact(`#${gateId}`).draggable({
+                inertia: false,
+                autoScroll: true,
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                        
+                        target.style.transform = `translate(${x}px, ${y}px)`;
+                        target.setAttribute('data-x', x);
+                        target.setAttribute('data-y', y);
+                        
+                        // Update connection lines
+                        updateConnections();
+                    }
+                }
+            });
+            
+            // Make connection points interactive
+            const connectionPoints = gateElement.querySelectorAll('.connection-point');
+            connectionPoints.forEach(point => {
+                point.addEventListener('mousedown', startConnection);
+                point.addEventListener('mouseup', endConnection);
+            });
+            
+            // Initialize gate dragging
+            interact(`#${gateId} .gate-node`).styleCursor(false);
+        }
+        
+        // Start creating a connection
+        function startConnection(event) {
+            event.stopPropagation();
+            connectingFrom = {
+                element: event.target,
+                gateId: event.target.parentElement.id,
+                type: event.target.classList.contains('input') ? 'input' : 'output'
+            };
+        }
+        
+        // Finish creating a connection
+        function endConnection(event) {
+            event.stopPropagation();
+            
+            if (!connectingFrom) return;
+            
+            const connectingTo = {
+                element: event.target,
+                gateId: event.target.parentElement.id,
+                type: event.target.classList.contains('input') ? 'input' : 'output'
+            };
+            
+            // Validate connection
+            if (connectingFrom.gateId === connectingTo.gateId) {
+                connectingFrom = null;
+                return; // Can't connect to self
+            }
+            
+            if (connectingFrom.type === connectingTo.type) {
+                connectingFrom = null;
+                return; // Can't connect input to input or output to output
+            }
+            
+            // Determine which is input and which is output
+            let output, input;
+            if (connectingFrom.type === 'output') {
+                output = {
+                    gateId: connectingFrom.gateId,
+                    element: connectingFrom.element
+                };
+                input = {
+                    gateId: connectingTo.gateId,
+                    element: connectingTo.element,
+                    index: Array.from(connectingTo.element.parentElement.querySelectorAll('.connection-point.input')).indexOf(connectingTo.element)
+                };
+            } else {
+                output = {
+                    gateId: connectingTo.gateId,
+                    element: connectingTo.element
+                };
+                input = {
+                    gateId: connectingFrom.gateId,
+                    element: connectingFrom.element,
+                    index: Array.from(connectingFrom.element.parentElement.querySelectorAll('.connection-point.input')).indexOf(connectingFrom.element)
+                };
+            }
+            
+            // Create connection
+            createConnection(output, input);
+            
+            connectingFrom = null;
+        }
+        
+        // Create a connection between gates
+        function createConnection(output, input) {
+            // Check if connection already exists
+            const existingConnection = connections.find(conn => 
+                conn.input.gateId === input.gateId && conn.input.index === input.index);
+            
+            if (existingConnection) {
+                // Remove existing connection
+                const line = document.getElementById(existingConnection.lineId);
+                if (line) line.remove();
+                
+                // Remove from connections array
+                connections = connections.filter(conn => conn.lineId !== existingConnection.lineId);
+                
+                // Update gate inputs
+                const gate = circuitGates.find(g => g.id === input.gateId);
+                if (gate) gate.inputs[input.index] = null;
+            }
+            
+            // Create new connection
+            const lineId = 'line-' + Date.now();
+            const workspace = document.getElementById('workspace');
+            
+            const line = document.createElement('div');
+            line.id = lineId;
+            line.className = 'connection-line';
+            workspace.appendChild(line);
+            
+            // Add to connections array
+            connections.push({
+                lineId,
+                output,
+                input
+            });
+            
+            // Update gate inputs
+            const gate = circuitGates.find(g => g.id === input.gateId);
+            if (gate) {
+                gate.inputs[input.index] = output.gateId;
+            }
+            
+            // Update connection lines
+            updateConnections();
+            
+            // Update circuit output
+            updateCircuitOutput();
+        }
+        
+        // Update all connection lines
+        function updateConnections() {
+            connections.forEach(connection => {
+                const line = document.getElementById(connection.lineId);
+                if (!line) return;
+                
+                const outputRect = connection.output.element.getBoundingClientRect();
+                const inputRect = connection.input.element.getBoundingClientRect();
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                
+                const outputX = outputRect.left + outputRect.width/2 - workspaceRect.left;
+                const outputY = outputRect.top + outputRect.height/2 - workspaceRect.top;
+                const inputX = inputRect.left + inputRect.width/2 - workspaceRect.left;
+                const inputY = inputRect.top + inputRect.height/2 - workspaceRect.top;
+                
+                const length = Math.sqrt(Math.pow(inputX - outputX, 2) + Math.pow(inputY - outputY, 2));
+                const angle = Math.atan2(inputY - outputY, inputX - outputX) * 180 / Math.PI;
+                
+                line.style.width = `${length}px`;
+                line.style.left = `${outputX}px`;
+                line.style.top = `${outputY}px`;
+                line.style.transform = `rotate(${angle}deg)`;
+            });
+        }
+        
+        // Update circuit inputs
+        function updateCircuitInputs() {
+            const inputA = document.getElementById('circuitInputA').value;
+            const inputB = document.getElementById('circuitInputB').value;
+            
+            // Find input gates (gates with no inputs connected)
+            const inputGates = circuitGates.filter(gate => 
+                gate.inputs.every(input => input === null));
+            
+            // For simplicity, assume first is A, second is B
+            if (inputGates.length > 0) {
+                inputGates[0].output = parseInt(inputA);
+            }
+            if (inputGates.length > 1) {
+                inputGates[1].output = parseInt(inputB);
+            }
+            
+            // Update circuit output
+            updateCircuitOutput();
+        }
+        
+        // Update circuit output by evaluating the circuit
+        function updateCircuitOutput() {
+            // Reset all gate outputs (except inputs)
+            circuitGates.forEach(gate => {
+                if (gate.inputs.some(input => input !== null)) {
+                    gate.output = null;
+                }
+            });
+            
+            // Evaluate the circuit
+            let outputValue = null;
+            let outputGate = circuitGates.find(gate => 
+                gate.inputs.some(input => input !== null) && 
+                !connections.some(conn => conn.output.gateId === gate.id));
+            
+            if (outputGate) {
+                outputValue = evaluateGate(outputGate);
+            }
+            
+            // Display output
+            document.getElementById('circuitOutput').textContent = 
+                outputValue !== null ? outputValue : '-';
+        }
+        
+        // Recursively evaluate a gate
+        function evaluateGate(gate) {
+            if (gate.output !== null) return gate.output;
+            
+            // Get input values
+            const inputValues = gate.inputs.map(input => {
+                if (input === null) return 0; // Unconnected inputs default to 0
+                
+                const inputGate = circuitGates.find(g => g.id === input);
+                if (!inputGate) return 0;
+                
+                return evaluateGate(inputGate);
+            });
+            
+            // Calculate output
+            gate.output = simulateGate(gate.type, ...inputValues);
+            return gate.output;
+        }
+        
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            calculate();
+            // Initialize simulation
+            updateSimulationGate();
+            generateTruthTable();
+            
+            // Initialize circuit builder
+            initCircuitBuilder();
+            
+            // Render MathJax
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typeset();
+            }
         });
     </script>
 </body>
